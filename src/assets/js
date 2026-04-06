@@ -1,0 +1,9 @@
+const dishes = [
+  { name: "Biryani", image: "https://via.placeholder.com/400x300?text=Biryani" },
+  { name: "Chicken", image: "https://via.placeholder.com/400x300?text=Chicken" },
+  { name: "Mutton", image: "https://via.placeholder.com/400x300?text=Mutton" },
+  { name: "Chicken 65", image: "https://via.placeholder.com/400x300?text=Chicken65" },
+  { name: "Feerni", image: "https://via.placeholder.com/400x300?text=Feerni" },
+  { name: "Gajar Halwa", image: "https://via.placeholder.com/400x300?text=GajarHalwa" },
+  { name: "Pumpkin Halwa", image: "https://via.placeholder.com/400x300?text=PumpkinHalwa" },
+];
