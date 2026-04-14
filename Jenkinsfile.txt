@@ -10,7 +10,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // This assumes you have the SonarQube Scanner plugin installed
+                    // This Assumes you have the SonarQube Scanner plugin installed
                     // and 'sonar' configured in Jenkins System Tools
                     def scannerHome = tool 'sonar' 
                     withSonarQubeEnv('sonar') {
