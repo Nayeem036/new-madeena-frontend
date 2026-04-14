@@ -1,9 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Import the navigation hook
 import "./Home.css";
-import ownerImg from "../assets/owner.jpg"; // Adjust file name if different
-import logo from "../assets/logo.png"; // Your logo file
+import ownerImg from "../assets/owner.jpg"; 
+import logo from "../assets/logo.png"; 
 
 const Home = () => {
+  const navigate = useNavigate(); // Initialize the navigate function
+
   return (
     <div className="home-container">
       {/* Logo Section */}
@@ -18,7 +21,9 @@ const Home = () => {
         <p className="authentic-line">
           Serving Authentic Taste with Passion, Tradition, and Trust
         </p>
-        <button className="order-btn" onClick={() => (window.location.href = "/booking")}>
+        
+        {/* Updated Button to use React Router navigate */}
+        <button className="order-btn" onClick={() => navigate("/booking")}>
           Order Now
         </button>
       </div>
