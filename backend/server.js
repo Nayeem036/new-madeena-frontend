@@ -36,6 +36,17 @@ app.post('/api/booking', async (req, res) => {
     }
 });
 
+// 4. API Route to fetch all bookings for the Admin Dashboard
+app.get('/api/admin/bookings', async (req, res) => {
+    try {
+        const allBookings = await Booking.find().sort({ createdAt: -1 }); // Newest first
+        res.status(200).json(allBookings);
+    } catch (error) {
+        console.error("Fetch error:", error);
+        res.status(500).json({ error: "Could not retrieve bookings" });
+    }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
