@@ -10,8 +10,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // This Assumes you have the SonarQube Scanner plugin installed
-                    // and 'sonar' configured in Jenkins System Tools
                     def scannerHome = tool 'sonar' 
                     withSonarQubeEnv('sonar') {
                         sh "${scannerHome}/bin/sonar-scanner \
@@ -22,21 +20,28 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Build & Deploy Frontend') {
             steps {
                 script {
-                    sh 'docker build --no-cache --pull -t catering-frontend:latest .'
+                    // Build from the root if Dockerfile is there, or add ./frontend if moved
+                    sh 'docker build --no-cache -t catering-frontend:latest .'
+                    sh 'docker stop catering-container || true'
+                    sh 'docker rm catering-container || true'
+                    sh 'docker run -d -p 3000:80 --name catering-container catering-frontend:latest'
                 }
             }
         }
 
-        stage('Docker Tag & Run') {
+        stage('Build & Deploy Backend') {
             steps {
                 script {
-                    sh 'docker stop catering-container || true'
-                    sh 'docker rm catering-container || true'
-                    // Updated to map external 3000 to internal 80
-                    sh 'docker run -d -p 3000:80 --name catering-container catering-frontend:latest'
+                    // Navigate into the backend folder you created
+                    dir('backend') {
+                        sh 'docker build -t catering-backend:latest .'
+                        sh 'docker stop catering-backend-container || true'
+                        sh 'docker rm catering-backend-container || true'
+                        sh 'docker run -d -p 5000:5000 --name catering-backend-container catering-backend:latest'
+                    }
                 }
             }
         }
