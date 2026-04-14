@@ -1,28 +1,27 @@
-import React, { useState } from "react";
-
-function Booking() {
-  const [formData, setFormData] = useState({ name: "", phone: "", eventDate: "", guests: "" });
-
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Booking form submitted! Backend connection will come later.");
-    // Later: connect to Lambda API
+    
+    try {
+      // Connect to your AWS Public IP on Port 5000
+      const response = await fetch('http://13.221.125.85:5000/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData), // Sends name, phone, eventDate, and guests
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert("Success! " + result.message);
+        // Optional: Clear form after success
+        setFormData({ name: "", phone: "", eventDate: "", guests: "" });
+      } else {
+        const errorData = await response.json();
+        alert("Server Error: " + (errorData.error || "Failed to submit"));
+      }
+    } catch (error) {
+      console.error("Connection Error:", error);
+      alert("Could not reach the backend. Please check if Port 5000 is open in AWS Security Groups.");
+    }
   };
-
-  return (
-    <div className="page">
-      <h1>Book Your Event</h1>
-      <form onSubmit={handleSubmit} className="booking-form">
-        <input name="name" placeholder="Name" onChange={handleChange} required />
-        <input name="phone" placeholder="Phone" onChange={handleChange} required />
-        <input name="eventDate" type="date" onChange={handleChange} required />
-        <input name="guests" placeholder="Number of Guests" onChange={handleChange} required />
-        <button type="submit">Submit Booking</button>
-      </form>
-    </div>
-  );
-}
-
-export default Booking;
