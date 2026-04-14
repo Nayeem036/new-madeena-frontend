@@ -23,7 +23,6 @@ pipeline {
         stage('Build & Deploy Frontend') {
             steps {
                 script {
-                    // Build from the root if Dockerfile is there, or add ./frontend if moved
                     sh 'docker build --no-cache -t catering-frontend:latest .'
                     sh 'docker stop catering-container || true'
                     sh 'docker rm catering-container || true'
@@ -35,14 +34,35 @@ pipeline {
         stage('Build & Deploy Backend') {
             steps {
                 script {
-                    // Navigate into the backend folder you created
                     dir('backend') {
                         sh 'docker build -t catering-backend:latest .'
                         sh 'docker stop catering-backend-container || true'
                         sh 'docker rm catering-backend-container || true'
-                        sh 'docker run -d -p 5000:5000 --name catering-backend-container catering-backend:latest'
+                        // Added --network="host" so it can find the MongoDB container on localhost
+                        sh 'docker run -d --network="host" --name catering-backend-container catering-backend:latest'
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Change 'your-s3-bucket-name' to your actual bucket name
+                def bucket = "nayeem-madeena-logs"
+                
+                sh """
+                    # Capture logs from all three containers
+                    docker logs catering-container > frontend.log 2>&1
+                    docker logs catering-backend-container > backend.log 2>&1
+                    docker logs catering-db > mongodb.log 2>&1
+                    
+                    # Upload to S3 categorized by Jenkins Build Number
+                    aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log
+                    aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log
+                    aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log
+                """
             }
         }
     }
