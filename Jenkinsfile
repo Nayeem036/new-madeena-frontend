@@ -49,19 +49,22 @@ pipeline {
     post {
         always {
             script {
-                // Change 'your-s3-bucket-name' to your actual bucket name
                 def bucket = "nayeem-madeena-logs"
                 
                 sh """
-                    # Capture logs from all three containers
-                    docker logs catering-container > frontend.log 2>&1
-                    docker logs catering-backend-container > backend.log 2>&1
-                    docker logs catering-db > mongodb.log 2>&1
+                    # Capture logs safely (using || true so a missing container won't crash the build)
+                    docker logs catering-container > frontend.log 2>&1 || true
+                    docker logs catering-backend-container > backend.log 2>&1 || true
+                    docker logs catering-db > mongodb.log 2>&1 || true
                     
-                    # Upload to S3 categorized by Jenkins Build Number
-                    aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log
-                    aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log
-                    aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log
+                    # Upload to S3 safely (using || true so AWS CLI issues won't crash the build)
+                    if command -v aws >/dev/null 2>&1; then
+                        aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
+                        aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
+                        aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log || true
+                    else
+                        echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
+                    fi
                 """
             }
         }
