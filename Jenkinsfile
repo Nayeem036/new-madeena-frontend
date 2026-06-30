@@ -38,7 +38,6 @@ pipeline {
                         sh 'docker build -t catering-backend:latest .'
                         sh 'docker stop catering-backend-container || true'
                         sh 'docker rm catering-backend-container || true'
-                        // Added --network="host" so it can find the MongoDB container on localhost
                         sh 'docker run -d --network="host" --name catering-backend-container catering-backend:latest'
                     }
                 }
@@ -58,7 +57,7 @@ pipeline {
                     docker logs catering-db > mongodb.log 2>&1 || true
                 """
                 
-                // Securely use the AWS credentials we saved in Jenkins
+                // Securely use the AWS credentials saved in Jenkins
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding', 
                     credentialsId: 'aws-credentials-id', 
@@ -78,3 +77,4 @@ pipeline {
             }
         }
     }
+}
