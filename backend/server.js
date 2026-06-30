@@ -37,9 +37,9 @@ app.post('/api/booking', async (req, res) => {
         const newBooking = new Booking(req.body);
         await newBooking.save();
         
-        // 🎉 ATTRACTIVE & REASSURING SUCCESS MESSAGE 🎉
+        //  CLEAN & ATTRACTIVE SUCCESS MESSAGE 
         res.status(201).json({ 
-            message: "🎉 Success! Your catering order has been successfully booked. We look forward to serving you!" 
+            message: " Your catering order has been successfully booked. We look forward to serving you!" 
         });
     } catch (error) {
         console.error("Save error:", error);
