@@ -1,11 +1,5 @@
 pipeline {
     agent any
-    
-    environment {
-        // This cleanly injects your AWS credentials without cluttering the post-build script blocks
-        AWS_ACCESS_KEY_ID     = credentials('aws-credentials-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id')
-    }
 
     stages {
         stage('Checkout Code') {
@@ -57,29 +51,40 @@ pipeline {
             script {
                 def bucket = "nayeem-madeena-logs"
                 
+                // 1. Provision spreadsheet generator tools and pull rows
                 sh """
-                    # 1. Capture basic system logs safely
-                    docker logs catering-container > frontend.log 2>&1 || true
-                    docker logs catering-backend-container > backend.log 2>&1 || true
+                    sudo apt-get update && sudo apt-get install -y python3-pip || true
+                    pip3 install pymongo openpyxl --break-system-packages || true
                     
-                    # 2. Build the visual HTML report from MongoDB data
                     cd backend
-                    npm install mongodb --no-save || true
-                    node generate-report.js || true
+                    python3 generate_excel_report.py || true
                     cd ..
-                    
-                    # 3. Upload logs and HTML report to S3 safely if AWS CLI is ready
-                    if command -v aws >/dev/null 2>&1; then
-                        aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
-                        aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
-                        
-                        if [ -f "booking_report.html" ]; then
-                            aws s3 cp booking_report.html s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.html --content-type "text/html" || true
-                        fi
-                    else
-                        echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
-                    fi
                 """
+                
+                // 2. Wrap AWS commands cleanly utilizing Jenkins environment injection binding
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'aws-credentials-id', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh """
+                        export AWS_ACCESS_KEY_ID=\$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=\$AWS_SECRET_ACCESS_KEY
+                        export AWS_DEFAULT_REGION="us-east-1"
+                        
+                        if command -v aws >/dev/null 2>&1; then
+                            if [ -f "booking_report.xlsx" ]; then
+                                aws s3 cp booking_report.xlsx s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.xlsx || true
+                                echo "🚀 Colorful Excel file uploaded successfully!"
+                            else
+                                echo "❌ Excel report file was not found."
+                            fi
+                        else
+                            echo "⚠️ AWS CLI tool not present."
+                        fi
+                    """
+                }
             }
         }
     }
