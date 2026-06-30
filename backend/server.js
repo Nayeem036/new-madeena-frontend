@@ -3,11 +3,18 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
+
+// Enable CORS for all routes
 app.use(cors());
+
+// Explicitly handle and respond to CORS OPTIONS preflight requests
+app.options('*', cors()); 
+
+// Support JSON-encoded bodies
 app.use(express.json());
 
 // 1. Connect to the MongoDB Container
-// Since we will use --network="host", we use localhost
+// Since we use --network="host", we connect via localhost
 mongoose.connect('mongodb://localhost:27017/catering')
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err));
