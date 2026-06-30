@@ -10,14 +10,13 @@ function Booking() {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://13.221.125.85:5000/api/booking', {
+      const response = await fetch('http://54.234.8.36:5000/api/booking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData), // Uses formData from the useState above
       });
-
       if (response.ok) {
         const result = await response.json();
         alert("Success! " + result.message);
