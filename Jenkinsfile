@@ -51,13 +51,6 @@ pipeline {
             script {
                 def bucket = "nayeem-madeena-logs"
                 
-                // 1. Run the generation script inside the running backend container, then extract the file
-                sh """
-                    docker exec catering-backend-container node generate-report.js || true
-                    docker cp catering-backend-container:/app/booking_report.html ./booking_report.html || true
-                """
-                
-                // 2. Upload system logs and the generated visual dashboard report to S3
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding', 
                     credentialsId: 'aws-credentials-id', 
@@ -67,21 +60,13 @@ pipeline {
                     sh """
                         export AWS_DEFAULT_REGION="us-east-1"
                         
-                        # Save running container console logs
+                        # Capture runtime logs from both containers for debugging
                         docker logs catering-container > frontend.log 2>&1 || true
                         docker logs catering-backend-container > backend.log 2>&1 || true
                         
-                        # Upload log assets
+                        # Archive runtime console logs into your S3 bucket
                         aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
                         aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
-                        
-                        # Upload the visual HTML grid report
-                        if [ -f "booking_report.html" ]; then
-                            aws s3 cp booking_report.html s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.html --content-type "text/html" || true
-                            echo "🚀 Colored table report successfully uploaded to S3!"
-                        else
-                            echo "⚠️ Report dashboard file was missing or generation skipped."
-                        fi
                     """
                 }
             }
