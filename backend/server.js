@@ -18,13 +18,13 @@ mongoose.connect('mongodb://localhost:27017/catering')
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// 2. Booking Schema
+// 2. Updated Booking Schema (Made address optional to prevent crashes)
 const bookingSchema = new mongoose.Schema({
     name: { type: String, required: true },
     phone: { type: String, required: true },
     eventDate: { type: String, required: true },
     guests: { type: String, required: true },
-    address: { type: String, required: true },
+    address: { type: String, required: false, default: "Not Provided" }, // 👈 Made optional with a fallback default
     createdAt: { type: Date, default: Date.now }
 });
 
