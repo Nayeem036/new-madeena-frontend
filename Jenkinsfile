@@ -45,19 +45,24 @@ pipeline {
         }
     }
 
-    post {
+   post {
         always {
             script {
                 def bucket = "nayeem-madeena-logs"
                 
                 sh """
-                    # Capture logs safely
+                    # Capture basic system logs safely
                     docker logs catering-container > frontend.log 2>&1 || true
                     docker logs catering-backend-container > backend.log 2>&1 || true
-                    docker logs catering-db > mongodb.log 2>&1 || true
+                    
+                    # Install mongo dependency in Jenkins workspace workspace and run the colorful report script
+                    cd backend
+                    npm install mongodb --no-save || true
+                    node generate-report.js || true
+                    cd ..
                 """
                 
-                // Securely use the AWS credentials saved in Jenkins
+                // Securely use your AWS credentials to upload logs and the gorgeous visual report
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding', 
                     credentialsId: 'aws-credentials-id', 
@@ -66,15 +71,19 @@ pipeline {
                 ]]) {
                     sh """
                         if command -v aws >/dev/null 2>&1; then
+                            # Upload standard system logs
                             aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
                             aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
-                            aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log || true
+                            
+                            # Upload your beautiful visual booking dashboard file!
+                            if [ -f "booking_report.html" ]; then
+                                aws s3 cp booking_report.html s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.html --content-type "text/html" || true
+                            fi
                         else
-                            echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
+                            echo "AWS CLI not found. Skipping S3 upload."
                         fi
                     """
                 }
             }
         }
     }
-}
