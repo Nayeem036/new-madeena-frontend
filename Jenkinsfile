@@ -52,21 +52,29 @@ pipeline {
                 def bucket = "nayeem-madeena-logs"
                 
                 sh """
-                    # Capture logs safely (using || true so a missing container won't crash the build)
+                    # Capture logs safely
                     docker logs catering-container > frontend.log 2>&1 || true
                     docker logs catering-backend-container > backend.log 2>&1 || true
                     docker logs catering-db > mongodb.log 2>&1 || true
-                    
-                    # Upload to S3 safely (using || true so AWS CLI issues won't crash the build)
-                    if command -v aws >/dev/null 2>&1; then
-                        aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
-                        aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
-                        aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log || true
-                    else
-                        echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
-                    fi
                 """
+                
+                // Securely use the AWS credentials we saved in Jenkins
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'aws-credentials-id', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh """
+                        if command -v aws >/dev/null 2>&1; then
+                            aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
+                            aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
+                            aws s3 cp mongodb.log s3://${bucket}/build-${env.BUILD_NUMBER}/mongodb.log || true
+                        else
+                            echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
+                        fi
+                    """
+                }
             }
         }
     }
-}
