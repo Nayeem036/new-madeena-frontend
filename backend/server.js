@@ -14,17 +14,17 @@ app.options('*', cors());
 app.use(express.json());
 
 // 1. Connect to the MongoDB Container
-// Since we use --network="host", we connect via localhost
 mongoose.connect('mongodb://localhost:27017/catering')
     .then(() => console.log("✅ Connected to MongoDB"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// 2. Create the Booking Schema
+// 2. Updated Booking Schema (Added address field)
 const bookingSchema = new mongoose.Schema({
     name: { type: String, required: true },
     phone: { type: String, required: true },
     eventDate: { type: String, required: true },
     guests: { type: String, required: true },
+    address: { type: String, required: true }, // 👈 Added Address Field
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -37,9 +37,8 @@ app.post('/api/booking', async (req, res) => {
         const newBooking = new Booking(req.body);
         await newBooking.save();
         
-        //  CLEAN & ATTRACTIVE SUCCESS MESSAGE 
         res.status(201).json({ 
-            message: " Your catering order has been successfully booked. We look forward to serving you!" 
+            message: "🎉 Success! Your catering order has been successfully booked. We look forward to serving you!" 
         });
     } catch (error) {
         console.error("Save error:", error);
@@ -50,7 +49,7 @@ app.post('/api/booking', async (req, res) => {
 // 4. API Route to fetch all bookings for the Admin Dashboard (JSON)
 app.get('/api/admin/bookings', async (req, res) => {
     try {
-        const allBookings = await Booking.find().sort({ createdAt: -1 }); // Newest first
+        const allBookings = await Booking.find().sort({ createdAt: -1 });
         res.status(200).json(allBookings);
     } catch (error) {
         console.error("Fetch error:", error);
@@ -58,11 +57,9 @@ app.get('/api/admin/bookings', async (req, res) => {
     }
 });
 
-// 5. LIVE ADMIN LEDGER ROUTE (HTML View)
-// Visit: http://your-ip:5000/admin/ledger
+// 5. LIVE ADMIN LEDGER ROUTE (HTML View with Address Column)
 app.get('/admin/ledger', async (req, res) => {
     try {
-        // Fetch real-time data using your Mongoose model (Newest first)
         const bookings = await Booking.find().sort({ createdAt: -1 }); 
         
         let html = `
@@ -73,7 +70,7 @@ app.get('/admin/ledger', async (req, res) => {
             <title>Madeena Catering Live Ledger</title>
             <style>
                 body { font-family: "Segoe UI", sans-serif; margin: 40px; background-color: #f8f9fa; }
-                .container { max-width: 1200px; margin: 0 auto; }
+                .container { max-width: 1300px; margin: 0 auto; }
                 .header-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
                 h2 { color: #2C3E50; margin: 0; font-size: 26px; }
                 .refresh-badge { background-color: #2ECC71; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; text-transform: uppercase; }
@@ -83,6 +80,7 @@ app.get('/admin/ledger', async (req, res) => {
                 tr:nth-child(even) { background-color: #f9fbf9; }
                 tr:hover { background-color: #e8f8f0; transition: background 0.15s ease-in-out; }
                 .badge { background-color: #E2FBE8; color: #1E7E34; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid #c3e6cb; }
+                .address-text { color: #2980b9; font-weight: 500; }
                 .empty { text-align: center; color: #718096; padding: 30px; font-style: italic; }
             </style>
         </head>
@@ -99,6 +97,7 @@ app.get('/admin/ledger', async (req, res) => {
                             <th>Phone Number</th>
                             <th>Event Date</th>
                             <th>Guests</th>
+                            <th>Event Delivery Address</th> <!-- 👈 New Column -->
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -106,7 +105,7 @@ app.get('/admin/ledger', async (req, res) => {
         `;
         
         if (!bookings || bookings.length === 0) {
-            html += `<tr><td colspan="5" class="empty">No live bookings found in the database yet.</td></tr>`;
+            html += `<tr><td colspan="6" class="empty">No live bookings found in the database yet.</td></tr>`;
         } else {
             bookings.forEach(b => {
                 html += `
@@ -115,6 +114,7 @@ app.get('/admin/ledger', async (req, res) => {
                         <td>${b.phone || 'N/A'}</td>
                         <td>${b.eventDate || 'N/A'}</td>
                         <td>${b.guests || 'N/A'}</td>
+                        <td class="address-text">${b.address || 'N/A'}</td> <!-- 👈 Render Address -->
                         <td><span class="badge">Confirmed</span></td>
                     </tr>
                 `;
