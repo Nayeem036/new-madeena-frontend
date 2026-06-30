@@ -1,5 +1,12 @@
 pipeline {
     agent any
+    
+    environment {
+        // This cleanly injects your AWS credentials without cluttering the post-build script blocks
+        AWS_ACCESS_KEY_ID     = credentials('aws-credentials-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id')
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -45,45 +52,35 @@ pipeline {
         }
     }
 
-   post {
+    post {
         always {
             script {
                 def bucket = "nayeem-madeena-logs"
                 
                 sh """
-                    # Capture basic system logs safely
+                    # 1. Capture basic system logs safely
                     docker logs catering-container > frontend.log 2>&1 || true
                     docker logs catering-backend-container > backend.log 2>&1 || true
                     
-                    # Install mongo dependency in Jenkins workspace workspace and run the colorful report script
+                    # 2. Build the visual HTML report from MongoDB data
                     cd backend
                     npm install mongodb --no-save || true
                     node generate-report.js || true
                     cd ..
-                """
-                
-                // Securely use your AWS credentials to upload logs and the gorgeous visual report
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding', 
-                    credentialsId: 'aws-credentials-id', 
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                ]]) {
-                    sh """
-                        if command -v aws >/dev/null 2>&1; then
-                            # Upload standard system logs
-                            aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
-                            aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
-                            
-                            # Upload your beautiful visual booking dashboard file!
-                            if [ -f "booking_report.html" ]; then
-                                aws s3 cp booking_report.html s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.html --content-type "text/html" || true
-                            fi
-                        else
-                            echo "AWS CLI not found. Skipping S3 upload."
+                    
+                    # 3. Upload logs and HTML report to S3 safely if AWS CLI is ready
+                    if command -v aws >/dev/null 2>&1; then
+                        aws s3 cp frontend.log s3://${bucket}/build-${env.BUILD_NUMBER}/frontend.log || true
+                        aws s3 cp backend.log s3://${bucket}/build-${env.BUILD_NUMBER}/backend.log || true
+                        
+                        if [ -f "booking_report.html" ]; then
+                            aws s3 cp booking_report.html s3://${bucket}/build-${env.BUILD_NUMBER}/booking_report.html --content-type "text/html" || true
                         fi
-                    """
-                }
+                    else
+                        echo "AWS CLI not found on Jenkins agent. Skipping S3 upload."
+                    fi
+                """
             }
         }
     }
+}
