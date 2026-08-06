@@ -1,90 +1,32 @@
-import React from "react";
-
-const Menu = () => {
-  const menuItems = [
-    {
-      name: "Chicken Biryani",
-      image:
-        "https://www.indianhealthyrecipes.com/wp-content/uploads/2021/12/chicken-biryani.jpg",
-    },
-    {
-      name: "Mutton Biryani",
-      image:
-        "https://www.cubesnjuliennes.com/wp-content/uploads/2021/02/Best-Mutton-Biryani-Recipe.jpg",
-    },
-    {
-      name: "Chicken 65",
-      image:
-        "https://www.indianhealthyrecipes.com/wp-content/uploads/2022/12/chicken-65-recipe.jpg",
-    },
-    {
-      name: "Feerni",
-      image:
-        "https://www.vegrecipesofindia.com/wp-content/uploads/2021/08/phirni-recipe-1.jpg",
-    },
-    {
-      name: "Gajar Halwa (Carrot Halwa)",
-      image:
-        "https://www.vegrecipesofindia.com/wp-content/uploads/2020/12/gajar-halwa-recipe-1.jpg",
-    },
-    {
-      name: "Pumpkin Halwa",
-      image:
-        "https://www.vegrecipesofindia.com/wp-content/uploads/2021/09/kaddu-ka-halwa.jpg",
-    },
-  ];
-
-  const containerStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-    padding: "20px",
-    backgroundColor: "#f9f9f9",
-  };
-
-  const cardStyle = {
-    borderRadius: "12px",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-    overflow: "hidden",
-    backgroundColor: "#fff",
-    textAlign: "center",
-    transition: "transform 0.3s ease",
-  };
-
-  const imageStyle = {
-    width: "100%",
-    height: "200px",
-    objectFit: "cover",
-  };
-
-  const nameStyle = {
-    padding: "10px",
-    fontSize: "18px",
-    fontWeight: "bold",
-    color: "#333",
-  };
-
-  return (
-    <div style={containerStyle}>
-      {menuItems.map((item, index) => (
-        <div
-          key={index}
-          style={{
-            ...cardStyle,
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.transform = "scale(1.03)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.transform = "scale(1)")
-          }
-        >
-          <img src={item.image} alt={item.name} style={imageStyle} />
-          <div style={nameStyle}>{item.name}</div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default Menu;
+const menuItems = [
+  {
+    id: 1,
+    name: "Chicken Biryani",
+    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 2,
+    name: "Mutton Biryani",
+    image: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 3,
+    name: "Chicken 65",
+    image: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 4,
+    name: "Feerni",
+    image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 5,
+    name: "Gajar Halwa (Carrot Halwa)",
+    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 6,
+    name: "Pumpkin Halwa",
+    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600&auto=format&fit=crop"
+  }
+];
