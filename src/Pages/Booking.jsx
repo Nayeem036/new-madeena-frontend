@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 
 function Booking() {
   const [formData, setFormData] = useState({ 
@@ -17,7 +18,6 @@ function Booking() {
     setIsSubmitting(true);
     
     try {
-      // 🚀 UPDATED TO YOUR NEW PUBLIC IP ADDRESS
       const response = await fetch('http://98.88.26.45:5000/api/booking', {
         method: 'POST',
         headers: {
@@ -28,14 +28,34 @@ function Booking() {
 
       if (response.ok) {
         const result = await response.json();
-        alert(result.message);
+        
+        // Branded SweetAlert2 Modal
+        Swal.fire({
+          title: "New Madeena Star Catering",
+          text: result.message || "🎉 Success! Your catering order has been successfully booked. We look forward to serving you!",
+          icon: "success",
+          confirmButtonColor: "#2ECC71",
+          confirmButtonText: "Awesome!",
+          borderRadius: "12px"
+        });
+
         setFormData({ name: "", phone: "", eventDate: "", guests: "", address: "" });
       } else {
-        alert("Server Error");
+        Swal.fire({
+          title: "New Madeena Star Catering",
+          text: "Server Error. Please try again.",
+          icon: "error",
+          confirmButtonColor: "#E74C3C"
+        });
       }
     } catch (error) {
       console.error("Connection Error:", error);
-      alert("Could not reach the backend.");
+      Swal.fire({
+        title: "New Madeena Star Catering",
+        text: "Could not reach the backend.",
+        icon: "warning",
+        confirmButtonColor: "#F39C12"
+      });
     } finally {
       setIsSubmitting(false);
     }
