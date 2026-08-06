@@ -44,7 +44,7 @@ function Booking() {
   return (
     <div style={styles.pageContainer}>
       <div style={styles.glassCard}>
-        <h1 style={styles.title}>✨ Book Your Event</h1>
+        <h1 style={styles.title}> 👨‍🍳 Book Your Event</h1>
         <p style={styles.subtitle}>Secure your dates with Madeena Catering effortlessly</p>
         
         <form onSubmit={handleSubmit} style={styles.formStructure}>
