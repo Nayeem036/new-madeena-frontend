@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
 
   const navLinks = [
@@ -12,44 +13,63 @@ function Navbar() {
     { name: "Contact", path: "/contact" }
   ];
 
+  // Dynamically listen for mobile screen width (<768px)
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <header style={styles.header}>
       <div style={styles.container}>
         <Link to="/" style={styles.logoGroup}>
           <span style={styles.logoBadge}>✨</span>
-          <h2 style={styles.logoText}>Madeena<span style={styles.goldText}>Catering</span></h2>
+          <h2 style={styles.logoText}>
+            Madeena<span style={styles.goldText}>Catering</span>
+          </h2>
         </Link>
 
-        {/* Desktop Links */}
-        <nav style={styles.desktopNav}>
-          {navLinks.map((link) => (
-            <Link 
-              key={link.path} 
-              to={link.path} 
-              style={{
-                ...styles.navLink,
-                ...(location.pathname === link.path ? styles.activeLink : {})
-              }}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop Navigation (Only rendered when NOT mobile) */}
+        {!isMobile && (
+          <nav style={styles.desktopNav}>
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                style={{
+                  ...styles.navLink,
+                  ...(location.pathname === link.path ? styles.activeLink : {})
+                }}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+        )}
 
-        {/* Mobile Toggle */}
-        <button style={styles.mobileBtn} onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? "✕" : "☰"}
-        </button>
+        {/* Mobile Hamburger Button (Only rendered when IS mobile) */}
+        {isMobile && (
+          <button style={styles.mobileBtn} onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? "✕" : "☰"}
+          </button>
+        )}
       </div>
 
-      {/* Mobile Drawer */}
-      {isOpen && (
+      {/* Mobile Drawer Dropdown Menu */}
+      {isMobile && isOpen && (
         <div style={styles.mobileDrawer}>
           {navLinks.map((link) => (
-            <Link 
-              key={link.path} 
-              to={link.path} 
-              style={styles.mobileNavLink}
+            <Link
+              key={link.path}
+              to={link.path}
+              style={{
+                ...styles.mobileNavLink,
+                ...(location.pathname === link.path ? styles.activeMobileLink : {})
+              }}
               onClick={() => setIsOpen(false)}
             >
               {link.name}
@@ -66,14 +86,13 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 1000,
-    backgroundColor: "rgba(15, 23, 42, 0.8)",
-    backdropFilter: "blur(12px)",
+    backgroundColor: "#0F172A",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
   },
   container: {
     maxWidth: "1200px",
     margin: "0 auto",
-    padding: "16px 24px",
+    padding: "14px 20px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center"
@@ -81,56 +100,60 @@ const styles = {
   logoGroup: {
     display: "flex",
     alignItems: "center",
-    gap: "10px"
+    gap: "8px"
   },
   logoBadge: {
-    fontSize: "20px"
+    fontSize: "18px"
   },
   logoText: {
-    fontSize: "20px",
+    fontSize: "18px",
     fontWeight: "800",
     color: "#FFFFFF",
-    letterSpacing: "-0.5px"
+    letterSpacing: "-0.5px",
+    margin: 0
   },
   goldText: {
     color: "#F59E0B"
   },
   desktopNav: {
     display: "flex",
-    gap: "32px",
+    gap: "28px",
     alignItems: "center"
   },
   navLink: {
     fontSize: "15px",
     fontWeight: "600",
     color: "#94A3B8",
-    transition: "all 0.2s ease"
+    paddingBottom: "4px"
   },
   activeLink: {
     color: "#F59E0B",
-    borderBottom: "2px solid #F59E0B",
-    paddingBottom: "4px"
+    borderBottom: "2px solid #F59E0B"
   },
   mobileBtn: {
-    display: "none",
     background: "none",
     border: "none",
     color: "#FFFFFF",
-    fontSize: "24px",
-    cursor: "pointer"
+    fontSize: "26px",
+    cursor: "pointer",
+    padding: "4px 8px"
   },
   mobileDrawer: {
     display: "flex",
     flexDirection: "column",
-    gap: "16px",
-    padding: "20px 24px",
-    backgroundColor: "#0F172A",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.1)"
+    gap: "14px",
+    padding: "16px 24px 24px",
+    backgroundColor: "#1E293B",
+    borderTop: "1px solid rgba(255, 255, 255, 0.05)"
   },
   mobileNavLink: {
-    fontSize: "18px",
+    fontSize: "16px",
     fontWeight: "600",
-    color: "#F8FAFC"
+    color: "#94A3B8"
+  },
+  activeMobileLink: {
+    color: "#F59E0B",
+    fontWeight: "700"
   }
 };
 

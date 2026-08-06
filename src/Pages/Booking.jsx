@@ -46,9 +46,9 @@ function Booking() {
     <div style={bookingStyles.pageWrapper}>
       <div style={bookingStyles.glassCard}>
         <div style={bookingStyles.headerArea}>
-          <span style={bookingStyles.badge}>Online Reservation</span>
-          <h1 style={bookingStyles.title}>Book Your Catering</h1>
-          <p style={bookingStyles.subtitle}>Select your date & details for an authentic culinary experience</p>
+          <span style={bookingStyles.badge}>🗓️Online Booking</span>
+          <h1 style={bookingStyles.title}>👨‍🍳Secure Your Event Date</h1>
+          <p style={bookingStyles.subtitle}>Experience authentic taste & flawless service tailored for your special day.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={bookingStyles.form}>
@@ -119,7 +119,7 @@ function Booking() {
             disabled={isSubmitting} 
             style={isSubmitting ? { ...bookingStyles.btn, opacity: 0.6 } : bookingStyles.btn}
           >
-            {isSubmitting ? "Processing..." : "Confirm Booking ✨"}
+            {isSubmitting ? "Processing..." : "Confirm Booking🚀"}
           </button>
         </form>
       </div>
