@@ -16,109 +16,100 @@ function Booking() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('http://98.88.26.45:5000/api/booking', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData), 
       });
 
       if (response.ok) {
-        const result = await response.json();
-        
-        // Branded SweetAlert2 Modal
         Swal.fire({
-          title: "New Madeena Star Catering",
-          text: result.message || "🎉 Success! Your catering order has been successfully booked. We look forward to serving you!",
+          title: "Reservation Received",
+          text: "Your catering order has been submitted successfully!",
           icon: "success",
-          confirmButtonColor: "#2ECC71",
-          confirmButtonText: "Awesome!",
-          borderRadius: "12px"
+          confirmButtonColor: "#F59E0B"
         });
-
         setFormData({ name: "", phone: "", eventDate: "", guests: "", address: "" });
       } else {
-        Swal.fire({
-          title: "New Madeena Star Catering",
-          text: "Server Error. Please try again.",
-          icon: "error",
-          confirmButtonColor: "#E74C3C"
-        });
+        Swal.fire({ title: "Error", text: "Server issue. Please try again.", icon: "error" });
       }
-    } catch (error) {
-      console.error("Connection Error:", error);
-      Swal.fire({
-        title: "New Madeena Star Catering",
-        text: "Could not reach the backend.",
-        icon: "warning",
-        confirmButtonColor: "#F39C12"
-      });
+    } catch (err) {
+      Swal.fire({ title: "Connection Error", text: "Unable to reach backend.", icon: "warning" });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div style={styles.pageContainer}>
-      <div style={styles.glassCard}>
-        <h1 style={styles.title}> 👨‍🍳Book Your Event</h1>
-        <p style={styles.subtitle}>Secure your dates with Madeena Catering effortlessly</p>
-        
-        <form onSubmit={handleSubmit} style={styles.formStructure}>
-          <div style={styles.inputWrapper}>
+    <div style={bookingStyles.pageWrapper}>
+      <div style={bookingStyles.glassCard}>
+        <div style={bookingStyles.headerArea}>
+          <span style={bookingStyles.badge}>Online Reservation</span>
+          <h1 style={bookingStyles.title}>Book Your Catering</h1>
+          <p style={bookingStyles.subtitle}>Select your date & details for an authentic culinary experience</p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={bookingStyles.form}>
+          <div style={bookingStyles.inputGroup}>
+            <label style={bookingStyles.label}>Full Name</label>
             <input 
               name="name" 
               value={formData.name} 
-              placeholder="Full Name" 
               onChange={handleChange} 
-              style={styles.modernInput} 
+              placeholder="e.g. John Doe" 
+              style={bookingStyles.input} 
               required 
             />
           </div>
 
-          <div style={styles.inputWrapper}>
+          <div style={bookingStyles.inputGroup}>
+            <label style={bookingStyles.label}>Phone Number</label>
             <input 
               name="phone" 
               value={formData.phone} 
-              placeholder="Phone Number" 
               onChange={handleChange} 
-              style={styles.modernInput} 
+              placeholder="+91 98765 43210" 
+              style={bookingStyles.input} 
               required 
             />
           </div>
 
-          <div style={styles.inputWrapper}>
-            <input 
-              name="eventDate" 
-              value={formData.eventDate} 
-              type="date" 
-              onChange={handleChange} 
-              style={styles.modernInput} 
-              required 
-            />
+          <div style={bookingStyles.gridTwo}>
+            <div style={bookingStyles.inputGroup}>
+              <label style={bookingStyles.label}>Event Date</label>
+              <input 
+                type="date" 
+                name="eventDate" 
+                value={formData.eventDate} 
+                onChange={handleChange} 
+                style={bookingStyles.input} 
+                required 
+              />
+            </div>
+            <div style={bookingStyles.inputGroup}>
+              <label style={bookingStyles.label}>Guest Count</label>
+              <input 
+                type="number" 
+                name="guests" 
+                value={formData.guests} 
+                onChange={handleChange} 
+                placeholder="e.g. 250" 
+                style={bookingStyles.input} 
+                required 
+              />
+            </div>
           </div>
 
-          <div style={styles.inputWrapper}>
-            <input 
-              name="guests" 
-              value={formData.guests} 
-              placeholder="Estimated Guest Count" 
-              onChange={handleChange} 
-              style={styles.modernInput} 
-              required 
-            />
-          </div>
-
-          <div style={styles.inputWrapper}>
-            <input 
+          <div style={bookingStyles.inputGroup}>
+            <label style={bookingStyles.label}>Delivery Address</label>
+            <textarea 
               name="address" 
               value={formData.address} 
-              placeholder="Event Delivery Address" 
               onChange={handleChange} 
-              style={styles.modernInput} 
+              placeholder="Full venue address..." 
+              style={{ ...bookingStyles.input, height: "90px", resize: "none" }} 
               required 
             />
           </div>
@@ -126,9 +117,9 @@ function Booking() {
           <button 
             type="submit" 
             disabled={isSubmitting} 
-            style={isSubmitting ? { ...styles.submitBtn, ...styles.btnDisabled } : styles.submitBtn}
+            style={isSubmitting ? { ...bookingStyles.btn, opacity: 0.6 } : bookingStyles.btn}
           >
-            {isSubmitting ? "Processing Reservation..." : "Submit Booking 🚀"}
+            {isSubmitting ? "Processing..." : "Confirm Booking ✨"}
           </button>
         </form>
       </div>
@@ -136,75 +127,92 @@ function Booking() {
   );
 }
 
-const styles = {
-  pageContainer: {
-    minHeight: "100vh",
+const bookingStyles = {
+  pageWrapper: {
+    minHeight: "calc(100vh - 70px)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)",
-    padding: "20px"
+    padding: "40px 20px",
+    background: "radial-gradient(circle at top, #1E293B 0%, #0F172A 100%)"
   },
   glassCard: {
-    background: "rgba(255, 255, 255, 0.85)",
-    backdropFilter: "blur(12px)",
-    borderRadius: "16px",
-    padding: "40px",
     width: "100%",
-    maxWidth: "500px",
-    boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.06)",
-    border: "1px solid rgba(255, 255, 255, 0.4)",
-    textAlign: "center"
+    maxWidth: "540px",
+    backgroundColor: "rgba(30, 41, 59, 0.7)",
+    backdropFilter: "blur(16px)",
+    borderRadius: "24px",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
+    padding: "40px",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.4)"
+  },
+  headerArea: {
+    textAlign: "center",
+    marginBottom: "32px"
+  },
+  badge: {
+    display: "inline-block",
+    padding: "6px 14px",
+    backgroundColor: "rgba(245, 158, 11, 0.15)",
+    color: "#F59E0B",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginBottom: "12px"
   },
   title: {
-    color: "#2C3E50",
-    fontSize: "30px",
-    fontWeight: "700",
-    margin: "0 0 8px 0",
-    letterSpacing: "-0.5px"
+    fontSize: "28px",
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: "8px"
   },
   subtitle: {
-    color: "#7F8C8D",
     fontSize: "14px",
-    margin: "0 0 30px 0"
+    color: "#94A3B8"
   },
-  formStructure: {
+  form: {
     display: "flex",
     flexDirection: "column",
-    gap: "18px"
+    gap: "20px"
   },
-  inputWrapper: {
-    width: "100%"
+  gridTwo: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "16px"
   },
-  modernInput: {
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px"
+  },
+  label: {
+    fontSize: "13px",
+    fontWeight: "600",
+    color: "#CBD5E1"
+  },
+  input: {
     width: "100%",
     padding: "14px 16px",
-    borderRadius: "8px",
-    border: "1px solid #DCE4EC",
-    backgroundColor: "#FFFFFF",
-    fontSize: "15px",
-    color: "#34495E",
-    transition: "all 0.2s ease-in-out",
-    boxSizing: "border-box",
+    backgroundColor: "rgba(15, 23, 42, 0.6)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "12px",
+    color: "#FFFFFF",
+    fontSize: "14px",
     outline: "none"
   },
-  submitBtn: {
+  btn: {
     width: "100%",
-    padding: "15px",
-    borderRadius: "8px",
+    padding: "16px",
+    backgroundColor: "#F59E0B",
+    color: "#0F172A",
     border: "none",
-    backgroundColor: "#2ECC71",
-    color: "#FFFFFF",
+    borderRadius: "12px",
     fontSize: "16px",
-    fontWeight: "600",
+    fontWeight: "700",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    boxShadow: "0 4px 12px rgba(46, 204, 113, 0.2)"
-  },
-  btnDisabled: {
-    backgroundColor: "#95A5A6",
-    cursor: "not-allowed",
-    boxShadow: "none"
+    marginTop: "10px",
+    boxShadow: "0 8px 20px rgba(245, 158, 11, 0.25)"
   }
 };
 
