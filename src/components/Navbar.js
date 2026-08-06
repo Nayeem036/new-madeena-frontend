@@ -27,9 +27,9 @@ function Navbar() {
     <header style={styles.header}>
       <div style={styles.container}>
         <Link to="/" style={styles.logoGroup}>
-          <span style={styles.logoBadge}>✨</span>
+          <span style={styles.logoBadge}></span>
           <h2 style={styles.logoText}>
-            Madeena<span style={styles.goldText}>Catering</span>
+            New Madeena<span style={styles.goldText}> Catering</span>
           </h2>
         </Link>
 

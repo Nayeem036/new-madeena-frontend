@@ -25,14 +25,24 @@ function Booking() {
       });
 
       if (response.ok) {
-        Swal.fire({
-          title: "Reservation Received",
-          text: "Your catering order has been submitted successfully!",
-          icon: "success",
-          confirmButtonColor: "#F59E0B"
-        });
-        setFormData({ name: "", phone: "", eventDate: "", guests: "", address: "" });
-      } else {
+  Swal.fire({
+    title: "Order Placed Successfully! ✨",
+    text: "Thank you for choosing New Madeena Star Catering. We will contact you shortly to confirm your event details.",
+    icon: "success",
+    confirmButtonText: "Great, thanks!",
+    confirmButtonColor: "#F59E0B",
+    background: "#1E293B",
+    color: "#F8FAFC",
+    customClass: {
+      popup: "rounded-2xl border border-slate-700",
+      title: "text-white font-bold",
+      confirmButton: "font-semibold px-6 py-2.5 rounded-xl"
+    }
+  });
+
+  // Reset form after successful submission
+  setFormData({ name: "", phone: "", eventDate: "", guests: "", address: "" });
+} else {
         Swal.fire({ title: "Error", text: "Server issue. Please try again.", icon: "error" });
       }
     } catch (err) {
