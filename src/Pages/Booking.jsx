@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 
 function Booking() {
-  // 1. Initialized formData state with the newly integrated address key
   const [formData, setFormData] = useState({ 
     name: "", 
     phone: "", 
     eventDate: "", 
     guests: "",
-    address: "" // 👈 Added address field tracking
+    address: "" 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,7 +17,8 @@ function Booking() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('http://54.234.8.36:5000/api/booking', {
+      // 🚀 UPDATED TO YOUR NEW PUBLIC IP ADDRESS
+      const response = await fetch('http://98.88.26.45:5000/api/booking', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,10 +28,7 @@ function Booking() {
 
       if (response.ok) {
         const result = await response.json();
-        // Displays your clean, singular attractive backend alert text smoothly
         alert(result.message);
-        
-        // Clear all fields completely upon successful resolution
         setFormData({ name: "", phone: "", eventDate: "", guests: "", address: "" });
       } else {
         alert("Server Error");
@@ -95,7 +92,6 @@ function Booking() {
             />
           </div>
 
-          {/* 2. Added New Address Field Input Wrapper */}
           <div style={styles.inputWrapper}>
             <input 
               name="address" 
@@ -120,7 +116,6 @@ function Booking() {
   );
 }
 
-// Advanced 2026 UI Design System CSS-in-JS Tokens
 const styles = {
   pageContainer: {
     minHeight: "100vh",
@@ -133,7 +128,6 @@ const styles = {
   glassCard: {
     background: "rgba(255, 255, 255, 0.85)",
     backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
     borderRadius: "16px",
     padding: "40px",
     width: "100%",
