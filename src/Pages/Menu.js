@@ -20,17 +20,17 @@ function Menu() {
     {
       id: 4,
       name: "Feerni",
-      image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=600&auto=format&fit=crop"
+      image: "https://www.cookclickndevour.com/wp-content/uploads/2020/08/Phirni-recipe-2-400x599.jpg"
     },
     {
       id: 5,
       name: "Gajar Halwa (Carrot Halwa)",
-      image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=600&auto=format&fit=crop"
+      image: "https://tse2.mm.bing.net/th/id/OIP.FgJx_z1snSKiuyivJ3IargHaEK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     {
       id: 6,
       name: "Pumpkin Halwa",
-      image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=600&auto=format&fit=crop"
+      image: "https://tse4.mm.bing.net/th/id/OIP.iOLrI1l5JOHI_iXWMZasTQHaJ4?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     }
   ];
 
